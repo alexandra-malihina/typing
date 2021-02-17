@@ -13,6 +13,9 @@ class Play{
             accuracy:100,
             current_letter:0,
             text_length:0,
+            time:0,
+            all_tap:0,
+            timer_id:null
         }
         this.start=false;
         this.messages={
@@ -23,6 +26,14 @@ class Play{
        
     }
     get_new_text(){
+        this.start=false;
+        this.data.accuracy=0;
+        this.data.text_length=0;
+        this.data.time=0;
+        this.data.all_tap=0;
+        this.data.current_letter=0;
+        this.data.text="";
+        
         let this_play=this;
        $.ajax({
         url:"https://baconipsum.com/api/?type=all-meat&paras=1&start-with-lorem=1&format=json",
@@ -57,19 +68,29 @@ class Play{
     }
 
     set_point_current_letter(ok=true){
+        $('.ok, .not_ok').removeClass('ok not_ok');
         if(ok){
             $('#'+this.data.current_letter).toggleClass('ok');
         }
         else{
             $('#'+this.data.current_letter).toggleClass('not_ok');
         }
+        this.set_block_info();
     }
 
     set_speed(){
-        $('#speed').html(this.data.speed+' min');
+        $('#speed').html(this.data.speed);
     }
     set_accuracy(){
-        $('#accuracy').html(this.data.accuracy+' %');
+        console.log(this.data.all_tap);
+        console.log(this.data.current_letter);
+        if(this.data.all_tap==0){
+            this.data.accuracy=100;
+        }
+        else{
+            this.data.accuracy=Math.floor(this.data.current_letter/this.data.all_tap*100);
+        }
+        $('#accuracy').html(this.data.accuracy);
     }
     set_block_info(){
         this.set_accuracy();
@@ -77,8 +98,11 @@ class Play{
     }
     set_start(start=true){
         this.start=start;
+        this.set_message();
+        this.set_block_info();
     }
     set_message(){
+        
         if (this.start){
             this.message_context.html(this.messages.to_end);
         }
@@ -86,17 +110,52 @@ class Play{
             this.message_context.html(this.messages.to_start);
         }
     }
-
-    button_action(button_code){
-        if(this.start && button_code==27){
-            this.start=false;
+    time_block(){
+        if(this.start){
+            $('time_block').toggleClass('show')
         }
-        if(!this.start && button_code==13){
-            this.start=true;
+    }
+    set_time(){
+
+    }
+
+    button_action(button_key){
+        if(this.start && button_key=="Escape"){
+            this.set_start(false);
+            clearInterval(this.data.timer_id);
+            this.data.timer_id=null;
+            return;
+        }
+        if(!this.start && button_key=="Enter"){
+            this.set_start(true);
+            this.data.timer_id = setInterval(this.set_block_info(),100);
+            return;
         } 
 
+        if(this.start==true){
+            
+            if(button_key=="Shift" || button_key=="CapsLock"){
+                if((this.data.text[this.data.current_letter].localeCompare(this.data.text[this.data.current_letter].toUpperCase())))
+                {
+                    this.set_point_current_letter(false);                   
+                }
+                return;
 
-        this.set_message();
+            }
+            this.data.all_tap++;
+            if(button_key==this.data.text[this.data.current_letter])
+            {
+                this.data.current_letter++;
+                this.set_point_current_letter(true);
+            }
+            else{
+                this.set_point_current_letter(false);
+
+            }
+        }
+        
+
+        
     }
 }
 let play = new Play();

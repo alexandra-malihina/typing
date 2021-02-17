@@ -15,7 +15,7 @@ body{
 }
 .block{
     border-radius: 45px;
-    background-color: azure;
+    background-color: rgba(255,255,255,0.9);
     padding:35px;
 }
 #time_block{
@@ -84,11 +84,35 @@ body{
     height:100%;
     top:0px;
     z-index:0;
+
 }
 
-.ok{
-    background-color: greenyellow;
+.ok, .not_ok{
+    
     padding: 5px;
     border-radius: 5px;
     color:black;
+}
+.ok{
+    background-color: greenyellow;
+}
+.not_ok{
+    background-color: tomato;
+}
+#info small.dimension{
+    font-size: 20px;
+}
+.bub{
+    position: absolute;
+    opacity: 0.5;
+    font-size: 30px;
+    color:black;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+
+    display:block;
+}
+.bub span{
+    position:absolute;
 }
