@@ -116,3 +116,24 @@ body{
 .bub span{
     position:absolute;
 }
+#run_string{
+    height:50px;
+    overflow:hidden;
+}
+#run_string span {
+    font-size: 36px;
+
+}
+#run_string span.win{
+    color:green;
+}
+#run_string span.bad{
+    color:tomato;
+}
+
+#run_sting span.good{
+    color:yellowgreen;
+}
+#message{
+    font-size:30px;
+}

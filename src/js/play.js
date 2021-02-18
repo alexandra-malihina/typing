@@ -20,7 +20,7 @@ class Play{
         this.start=false;
         this.messages={
             to_start:"Press ENTER to start",
-            to_end:"Press ESC to stop",
+            to_end:"Press ESC to end",
         }
         this.get_new_text();
        
@@ -28,6 +28,7 @@ class Play{
     get_new_text(){
         this.start=false;
         this.data.accuracy=0;
+        this.data.speed=0;
         this.data.text_length=0;
         this.data.time=0;
         this.data.all_tap=0;
@@ -40,27 +41,34 @@ class Play{
 
         success:function(data){
             if(data){
-                console.log(data);
-                this_play.data.text=data[0];
-                this_play.data.text_length=data[0].length;
 
-                console.log(this_play);
+                this_play.data.text=data[0].replace(/\s+/g,' ').trim();
+                this_play.data.text_length=this_play.data.text.length;
+
                 this_play.set_new_text();
             }
             else{
-                //$(this).html("Error");
+                this_play.set_default_text();
             }
 
+        },
+        error: function(jqxhr, status, errorMsg) {
+            this_play.set_default_text();
         }
        });
        this.set_block_info();
        this.set_message();
     }
 
+    set_default_text(){
+        this.data.text="I am the best and most wonderful person. I'll make it work. And I will be able to type texts very quickly And they will call me - !? * % # - The fastest fingers in the West.".replace(/\s+/g,' ').trim();
+        this.data.text_length=this.data.text.length;
+        this.run_string("default_text");
+        this.set_new_text();
+    }
     set_new_text(){
         let this_play=this;
         this_play.context.empty();
-        console.log('set_new_text');
        for(let i=0;i<this_play.data.text_length;i++){
            this_play.context.append('<span id="'+i+'">'+this_play.data.text[i]+'</span>');
        }
@@ -82,8 +90,7 @@ class Play{
         $('#speed').html(this.data.speed);
     }
     set_accuracy(){
-        console.log(this.data.all_tap);
-        console.log(this.data.current_letter);
+
         if(this.data.all_tap==0){
             this.data.accuracy=100;
         }
@@ -110,46 +117,92 @@ class Play{
             this.message_context.html(this.messages.to_start);
         }
     }
-    time_block(){
-        if(this.start){
-            $('time_block').toggleClass('show')
+    time_block(inst){
+        console.log('timer');
+        console.log(inst.start);
+        if(inst.start){
+           let time=new Date().getTime()-inst.data.time;
+           inst.data.speed=Math.floor(inst.data.all_tap/(time/60/1000));
+           inst.set_block_info();
+           console.log('speed',inst.data.speed);
+           console.log(time);
         }
     }
     set_time(){
-
+        console.log('set time00');
+        let inst=this;
+        this.data.time=new Date().getTime();
+        this.data.timer_id=setInterval(inst.time_block, 500,inst);
+        $('time_block').toggleClass('show');
     }
+    run_string(mode=""){
+        let str="";
+        let className="";
+        let span=$('#string');
+        switch(mode){
+            case "good":str=run_string.good[Math.floor(Math.random()*run_string.good.length)]; className="good";break;
+            case "bad":str=run_string.bad[Math.floor(Math.random()*run_string.bad.length)]; className="bad";break;
+            case "win":str=run_string.win; className="win";break;
+            case "CapsLock":str=run_string.CapsLock; className="bad";break;
+            case "default_text":str=run_string.no_text; className="bad";break;
+            default: str=""; className="bad";break;
+        }
+        span.attr('class',className);
+        span.html(str);
+    }
+
 
     button_action(button_key){
         if(this.start && button_key=="Escape"){
             this.set_start(false);
             clearInterval(this.data.timer_id);
             this.data.timer_id=null;
+            this.get_new_text();
+            this.run_string();
             return;
         }
         if(!this.start && button_key=="Enter"){
             this.set_start(true);
-            this.data.timer_id = setInterval(this.set_block_info(),100);
+
             return;
         } 
 
+        if(this.start && this.data.current_letter==this.data.text_length){
+            this.get_new_text();
+            return;
+        }
+
         if(this.start==true){
             
+            if(button_key=="CapsLock"){
+                this.run_string("CapsLock");
+            }
             if(button_key=="Shift" || button_key=="CapsLock"){
                 if((this.data.text[this.data.current_letter].localeCompare(this.data.text[this.data.current_letter].toUpperCase())))
                 {
                     this.set_point_current_letter(false);                   
                 }
                 return;
-
             }
             this.data.all_tap++;
+            if(this.data.all_tap==1){
+                this.set_time();
+            }
             if(button_key==this.data.text[this.data.current_letter])
             {
                 this.data.current_letter++;
+                if(this.data.current_letter==this.data.text_length){
+                    this.run_string("win");
+                    clearInterval(this.data.timer_id);
+                    this.data.timer_id=null;
+                    return;
+                }
                 this.set_point_current_letter(true);
+                this.run_string("good");
             }
             else{
                 this.set_point_current_letter(false);
+                this.run_string("bad");
 
             }
         }
@@ -159,3 +212,4 @@ class Play{
     }
 }
 let play = new Play();
+
