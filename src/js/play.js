@@ -118,18 +118,13 @@ class Play{
         }
     }
     time_block(inst){
-        console.log('timer');
-        console.log(inst.start);
         if(inst.start){
            let time=new Date().getTime()-inst.data.time;
            inst.data.speed=Math.floor(inst.data.all_tap/(time/60/1000));
            inst.set_block_info();
-           console.log('speed',inst.data.speed);
-           console.log(time);
         }
     }
     set_time(){
-        console.log('set time00');
         let inst=this;
         this.data.time=new Date().getTime();
         this.data.timer_id=setInterval(inst.time_block, 500,inst);
