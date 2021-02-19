@@ -12,6 +12,7 @@ GENERAL USAGE NOTES
   - You can use the app without the Internet (there is one default text).
   - To work, you need a browser.
   - <b>Save files on your computer and open index.html to start.</b>
+  - <b>Or follow the link to view the work https://alex-mal.ru/typing</b>
   
 CREATED WITH
 -----------------------
@@ -23,3 +24,4 @@ AUTHOR AND CONTACTS
 Alexandra Malihina
 * vk - https://vk.com/art_from_alma
 * githaub - https://github.com/alexandra-malihina/
+* official site - https://alex-mal.ru
